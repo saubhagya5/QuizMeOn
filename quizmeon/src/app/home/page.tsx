@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState,useTransition  } from "react";
 import { useRouter } from "next/navigation";
 
 const QUIZ_STORAGE_KEY = "quizData";
@@ -10,6 +10,8 @@ export default function Home() {
   const [prompt, setPrompt] = useState("");
   const [difficulty, setDifficulty] = useState("Easy");
   const [numQuestions, setNumQuestions] = useState(10);
+  const [loading, setLoading] = useState(false);
+  let [isPending, startTransition] = useTransition();
 
   // Taylor Swift Dummy Quiz
   const dummyQuiz = {
@@ -125,26 +127,50 @@ export default function Home() {
   };
 
   // Handle Submit
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     console.log("Submitting quiz...");
     localStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify(dummyQuiz));
     router.push("/quiz");
+
+    // setLoading(true); // Show loading state
+
+    // try {
+    //   const response = await fetch("/api/quiz", {
+    //     method: "POST",
+    //     headers: { "Content-Type": "application/json" },
+    //     body: JSON.stringify({ prompt, difficulty, numQuestions }),
+    //   });
+
+    //   if (!response.ok) throw new Error("Failed to fetch quiz");
+
+    //   const quizData = await response.json();
+    //   localStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify(quizData));
+
+    //   startTransition(() => {
+    //     router.push("/quiz"); // Navigate only after fetching is done
+    //   });
+    // } catch (error) {
+    //   console.error("Error fetching quiz:", error);
+    // } finally {
+    //   setLoading(false);
+    // }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[#F9DBBD]">
+    <div className="flex  flex-col items-center justify-center min-h-screen bg-[#F9DBBD]">
+      {/* <h1 className="text-5xl p-4  text-[#450920] font-bold text-center">Quiz Me On</h1> */}
       <div className="bg-[#FFA5AB] border-[#450920] shadow-2xl border-x-4 border-y-4 p-6 rounded-2xl max-w-lg w-full text-[#450920] ">
         <h1 className="text-4xl font-bold text-center mb-6">Generate Your Quiz</h1>
         
         <textarea
-          className="w-full p-3 bg-[#F9DBBD] border border-[#450920]  rounded-md mb-4 text-[#450920] placeholder-[#450920] focus:ring-2 focus:border-[#450920] focus:outline-none"
+          className="w-full p-3 bg-[#F9DBBD] border border-[#450920]  rounded-md mb-4 text-[#450920] placeholder-[#450920] focus:ring-2  focus:ring-[#450920] focus:outline-none"
           placeholder="Enter quiz topic..."
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
         />
         
         <select
-          className="w-full p-3 bg-[#F9DBBD] border border-[#450920]  rounded-md mb-4 text-[#450920] focus:ring-2 focus:border-[#450920] focus:outline-none"
+          className="w-full p-3 bg-[#F9DBBD] border border-[#450920]  rounded-md mb-4 text-[#450920] focus:ring-2 focus:ring-[#450920] focus:outline-none"
           value={difficulty}
           onChange={(e) => setDifficulty(e.target.value)}
         >
@@ -154,7 +180,7 @@ export default function Home() {
         </select>
         
         <select
-          className="w-full p-3 bg-[#F9DBBD] border border-[#450920]  rounded-md mb-6 text-[#450920] focus:ring-2 focus:border-[#450920] focus:outline-none"
+          className="w-full p-3 bg-[#F9DBBD] border border-[#450920]  rounded-md mb-6 text-[#450920] focus:ring-2 focus:ring-[#450920] focus:outline-none"
           value={numQuestions}
           onChange={(e) => setNumQuestions(Number(e.target.value))}
         >

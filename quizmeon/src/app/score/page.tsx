@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 const SCORE_STORAGE_KEY = "quizScore";
-const QUIZ_TITLE_KEY = "quizTitle";
+const QUIZ_STORAGE_KEY = "quizData";
 
 export default function QuizResult() {
   const [quizTitle, setQuizTitle] = useState<string | null>(null);
@@ -13,10 +13,10 @@ export default function QuizResult() {
 
   useEffect(() => {
     // Retrieve the stored quiz title and score
-    const storedTitle = localStorage.getItem(QUIZ_TITLE_KEY);
+    const storedTitle = JSON.parse(localStorage.getItem(QUIZ_STORAGE_KEY));
     const storedScore = localStorage.getItem(SCORE_STORAGE_KEY);
-
-    if (storedTitle) setQuizTitle(storedTitle);
+    console.log("Stored quiz title:", storedTitle.title);
+    if (storedTitle) setQuizTitle(storedTitle.title);
     if (storedScore) setScore(parseInt(storedScore));
   }, []);
 
@@ -34,9 +34,10 @@ export default function QuizResult() {
 
   return (
     <div className="min-h-screen flex flex-col items-center p-6 bg-[#F9DBBD]">
-      <h1 className="text-5xl font-bold text-[#450920] mb-6">Quiz Result</h1>
-
-      <h2 className="text-3xl font-semibold text-[#A53860]">{quizTitle || "Quiz"}</h2>
+      <h1 className="text-5xl  text-[#450920] font-bold text-center">Quiz Me On</h1>
+      <br />
+      <br /><br />
+      <h2 className="text-2xl font-semibold text-[#A53860]">{quizTitle || "Quiz"}</h2>
 
       {score !== null ? (
         <p className="text-2xl mt-4 text-[#450920]">
