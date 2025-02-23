@@ -16,54 +16,71 @@ const SCORE_STORAGE_KEY = "quizScore";
 export default function QuizPage() {
   const [quiz, setQuiz] = useState<QuizQuestion[]>([]);
   const [userAnswers, setUserAnswers] = useState<Record<number, string>>({});
+  const [error, setError] = useState<string | null>(null);
+  const [isFetched, setIsFetched] = useState(false);
   const router = useRouter();
 
   // Load quiz data and answers from localStorage
   useEffect(() => {
     if (typeof window !== "undefined") {
       const savedQuiz = localStorage.getItem(QUIZ_STORAGE_KEY);
-      const savedAnswers = localStorage.getItem(USER_ANSWERS_KEY);
-
+      console.log("Saved quiz in localStorage:", savedQuiz);
+  
       if (savedQuiz) {
         try {
-          setQuiz(JSON.parse(savedQuiz));
+          const parsedQuiz = JSON.parse(savedQuiz);
+  
+          setQuiz(parsedQuiz.questions); // Ensure it's an array of questions
+  
+          
         } catch (error) {
           console.error("Error parsing stored quiz data:", error);
           localStorage.removeItem(QUIZ_STORAGE_KEY);
           fetchQuiz();
         }
       } else {
+        console.log("No quiz found in storage. Fetching...");
         fetchQuiz();
-      }
-
-      if (savedAnswers) {
-        try {
-          setUserAnswers(JSON.parse(savedAnswers));
-        } catch (error) {
-          console.error("Error parsing stored user answers:", error);
-          localStorage.removeItem(USER_ANSWERS_KEY);
-        }
       }
     }
   }, []);
 
+  
+  
+
   const fetchQuiz = async () => {
     try {
+      console.log("Fetching quiz...");
       const response = await fetch("/api/quiz");
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
       const data: QuizQuestion[] = await response.json();
-      setQuiz(data);
+      console.log("Fetched quiz data:", data);
+  
+      if (data.length === 0) {
+        console.warn("Fetched quiz data is empty.");
+        return;
+      }
+  
+      setQuiz(parsedQuiz.questions); // Ensure it's an array of questions
       localStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify(data));
+  
+      // Confirm state update
+      setTimeout(() => {
+        console.log("Quiz after fetch:", quiz);
+      }, 1000);
     } catch (error) {
       console.error("Failed to fetch quiz:", error);
     }
   };
+  
+  
 
   const handleAnswerSelect = (questionIndex: number, selectedOption: string) => {
-    const updatedAnswers = {
-      ...userAnswers,
-      [questionIndex]: selectedOption,
-    };
-
+    const updatedAnswers = { ...userAnswers, [questionIndex]: selectedOption };
     setUserAnswers(updatedAnswers);
     localStorage.setItem(USER_ANSWERS_KEY, JSON.stringify(updatedAnswers));
   };
@@ -91,14 +108,16 @@ export default function QuizPage() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold">Quiz</h1>
+      <h1 className="text-2xl font-bold text-center w-full">Quiz</h1>
+      <p>Quiz length: {quiz.length}</p> {/* Debugging line */}
       {quiz.length > 0 ? (
         quiz.map((q, index) => (
-          <div key={index} className="mt-4 p-4 border rounded-md shadow-md">
-            <h2 className="font-semibold">{q.question}</h2>
-            <ul>
+          <div key={index} className="mt-6 p-5 border rounded-md shadow-md">
+            <h2 className="font-semibold p-2">{q.question}</h2>
+            <ul className="w-[200px]">
               {q.options.map((option, i) => (
-                <li key={i} className="mt-2">
+                <li key={i} className="mt-4 flex gap-3 items-center">
+                  <span>{i + 1}</span>
                   <button
                     className={`px-4 py-2 rounded-md ${
                       userAnswers[index] === option
@@ -115,9 +134,9 @@ export default function QuizPage() {
           </div>
         ))
       ) : (
-        <p>Loading quiz...</p>
+        <p>Loading quiz... (Debug: {JSON.stringify(quiz)})</p>
       )}
-
+  
       <div className="mt-6 flex gap-4">
         <button
           onClick={handleSubmit}
@@ -134,4 +153,5 @@ export default function QuizPage() {
       </div>
     </div>
   );
+  
 }
