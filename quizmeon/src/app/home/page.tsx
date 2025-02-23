@@ -132,48 +132,46 @@ export default function Home() {
   };
 
   return (
-    <div className="p-6 max-w-2xl mx-auto">
-      <h1 className="text-3xl font-bold text-center mb-4">Generate Your Quiz</h1>
+    <div className="flex items-center justify-center min-h-screen bg-[#F9DBBD]">
+      <div className="bg-[#FFA5AB] border-[#450920] shadow-2xl border-x-4 border-y-4 p-6 rounded-2xl max-w-lg w-full text-[#450920] ">
+        <h1 className="text-4xl font-bold text-center mb-6">Generate Your Quiz</h1>
+        
+        <textarea
+          className="w-full p-3 bg-[#F9DBBD] border border-[#450920]  rounded-md mb-4 text-[#450920] placeholder-[#450920] focus:ring-2 focus:border-[#450920] focus:outline-none"
+          placeholder="Enter quiz topic..."
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+        />
+        
+        <select
+          className="w-full p-3 bg-[#F9DBBD] border border-[#450920]  rounded-md mb-4 text-[#450920] focus:ring-2 focus:border-[#450920] focus:outline-none"
+          value={difficulty}
+          onChange={(e) => setDifficulty(e.target.value)}
+        >
+          <option value="Easy">Easy</option>
+          <option value="Intermediate">Intermediate</option>
+          <option value="Hard">Hard</option>
+        </select>
+        
+        <select
+          className="w-full p-3 bg-[#F9DBBD] border border-[#450920]  rounded-md mb-6 text-[#450920] focus:ring-2 focus:border-[#450920] focus:outline-none"
+          value={numQuestions}
+          onChange={(e) => setNumQuestions(Number(e.target.value))}
+        >
+          {[5, 10, 15, 20].map((num) => (
+            <option key={num} value={num}>
+              {num} Questions
+            </option>
+          ))}
+        </select>
 
-      {/* Prompt Input */}
-      <textarea
-        className="w-full p-3 border rounded-md mb-4"
-        placeholder="Enter quiz topic..."
-        value={prompt}
-        onChange={(e) => setPrompt(e.target.value)}
-      />
-
-      {/* Difficulty Selector */}
-      <select
-        className="w-full p-2 border rounded-md mb-4"
-        value={difficulty}
-        onChange={(e) => setDifficulty(e.target.value)}
-      >
-        <option value="Easy">Easy</option>
-        <option value="Intermediate">Intermediate</option>
-        <option value="Hard">Hard</option>
-      </select>
-
-      {/* Number of Questions Selector */}
-      <select
-        className="w-full p-2 border rounded-md mb-4"
-        value={numQuestions}
-        onChange={(e) => setNumQuestions(Number(e.target.value))}
-      >
-        {[5, 10, 15, 20].map((num) => (
-          <option key={num} value={num}>
-            {num} Questions
-          </option>
-        ))}
-      </select>
-
-      {/* Submit Button */}
-      <button
-        onClick={handleSubmit}
-        className="w-full px-6 py-3 bg-blue-500 text-white font-bold rounded-md shadow-md hover:bg-blue-600 transition"
-      >
-        Submit
-      </button>
+        <button
+          onClick={handleSubmit}
+          className="w-full px-6 py-3 bg-[#A53860] text-lg text-white font-bold rounded-md shadow-md hover:opacity-80 transition"
+        >
+          Submit
+        </button>
+      </div>
     </div>
   );
 }
