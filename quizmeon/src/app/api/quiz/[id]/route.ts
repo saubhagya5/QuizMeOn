@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import Quiz from "@/models/Quiz";
-import { ObjectId } from "mongoose";
+
 
 export async function GET(req: Request, { params }: { params: { id: string } }) {
   try {

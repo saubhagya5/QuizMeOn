@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const GEMINI_API_KEY = process.env.GOOGLE_API_KEY || "";
-const genAI = new GoogleGenerativeAI("AIzaSyCKfOlpoOBfKE_sU6-cUNgexP6QVO_GBGg");
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
+const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
 export async function POST(req: Request) {
   try {
@@ -31,14 +31,14 @@ export async function POST(req: Request) {
           "correctAnswer": "Option 1"
         }
       ]
-    } Ensure that you return somehting that is only in JSON format wothotu any other text or characters.`;
+    } Ensure that you return somehting that is only in JSON format without any other text or characters.`;
 
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
     const response = await model.generateContent(prompt);
 
-    const textResponse = await response.response.text(); // Extracting text properly
+    const textResponse = await response.response.text(); 
 
-    console.log("textResponse:", textResponse); // Log the response
+    console.log("textResponse:", textResponse); 
 
     if (!textResponse) {
       return NextResponse.json(
@@ -49,7 +49,7 @@ export async function POST(req: Request) {
 
     let quizData;
     try {
-      quizData = JSON.parse(textResponse); // Convert to JSON
+      quizData = JSON.parse(textResponse); 
     } catch (parseError) {
       console.error("JSON Parse Error:", parseError);
       console.error("Invalid JSON response:", textResponse);
