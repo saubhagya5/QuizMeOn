@@ -103,9 +103,9 @@ export default function QuizPage() {
     const storedAnswers = JSON.parse(localStorage.getItem(USER_ANSWERS_KEY) || "{}");
     let score = 0;
     quiz.forEach((q, index) => {
-      console.log("Checking answer for question", storedAnswers[index], q.answer);
+      console.log("Checking answer for question",storedAnswers, storedAnswers[index], q.correctAnswer);
 
-      if (storedAnswers[index] === q.answer) {
+      if (storedAnswers[index] === q.correctAnswer) {
         score += 1;
       }
     });
@@ -124,60 +124,70 @@ export default function QuizPage() {
   };
 
   return (
-    <div className="p-6 bg-[#F9DBBD]">
-      <h1 className="text-5xl  text-[#450920] font-bold text-center">Quiz Me On</h1>
-      <p className="text-base font-semibold text-[#A53860] text-center ">Quiz length: {quiz.length}  Difficulty: {quizData.difficulty} </p>
-      <br />
-      <hr className="border-[#450920] border-x-2 border-y-2 " />
-      
-      <br />
-      
-      <h2 className="text-3xl text-[#A53860] font-bold text-center"> {quizData.title}</h2>
-      
-      <div className="flex flex-col text-[#450920] items-center w-1/24 p-6 rounded-md">
-      {quiz.length > 0 ? (
-        quiz.map((q, index) => (
-          <div key={index} className="mt-6 p-5 border border-[#450920] shadow-2xl border-x-4 border-y-4 bg-[#FFA5AB] rounded-md   w-[700px]">
-           <h2 className="font-semibold text-xl p-2">{index+1}. {q.question}</h2>
-            <ul className="">
-              {q.options.map((option, i) => (
-                <li key={i} className="mt-4 flex gap-3 ">
-                  {/* <span>{i + 1}</span> */}
-                  <button
-                    className={`px-4 py-2  text-lg rounded-md ${
-                      userAnswers[index] === option
-                        ? "bg-[#DA627D] border border-[#450920] border-x-2 border-y-2 text-white"
-                        : "bg-[#A53860] text-white"
-                    }`}
-                    onClick={() => handleAnswerSelect(index, option)}
-                  >
-                    {option}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))
-      ) : (
-        <p>Loading quiz... </p>
+    <div className="p-6 bg-[#F9DBBD] min-h-screen">
+      <h1 className="text-3xl md:text-5xl text-[#450920] font-bold text-center">
+        Quiz Me On
+      </h1>
+      <p className="text-lg md:text-xl font-semibold text-[#A53860] text-center mt-2">
+        Quiz length: {quiz.length} | Difficulty: {quizData.difficulty}
+      </p>
+  
+      <hr className="border-[#450920] border-x-2 border-y-2 my-4" />
+  
+      <h2 className="text-2xl md:text-3xl text-[#A53860] font-bold text-center mt-4">
+        {quizData.title}
+      </h2>
+  
+      <div className="flex flex-col items-center w-full p-4">
+        {quiz.length > 0 ? (
+          quiz.map((q, index) => (
+            <div
+              key={index}
+              className="mt-6 p-5 border border-[#450920] shadow-2xl border-x-4 border-y-4 bg-[#FFA5AB] rounded-md w-full max-w-3xl"
+            >
+              <h2 className="font-semibold text-lg md:text-xl p-2 text-[#A53860]">
+                {index + 1}. {q.question}
+              </h2>
+              <ul>
+                {q.options.map((option, i) => (
+                  <li key={i} className="mt-3">
+                    <button
+                      className={`w-full md:w-auto px-4 py-2 text-lg rounded-md block ${
+                        userAnswers[index] === option
+                          ? "bg-[#DA627D] border border-[#450920] text-white"
+                          : "bg-[#A53860] text-white"
+                      }`}
+                      onClick={() => handleAnswerSelect(index, option)}
+                    >
+                      {option}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        ) : (
+          <p className="text-center text-lg">Loading quiz...</p>
         )}
-        <div className="mt-6 flex gap-4">
-        <button
-          onClick={handleSubmit}
-          className="px-4 py-2 bg-[#A53860] text-lg text-white rounded-md"
-        >
-          Submit Quiz
-        </button>
-        <button
-          onClick={resetQuiz}
-          className="px-4 py-2 bg-[#A53860] text-lg text-white rounded-md"
-        >
-          Reset Quiz
-        </button>
+  
+        {/* Buttons */}
+        <div className="mt-6 flex flex-col md:flex-row gap-4 w-full max-w-sm">
+          <button
+            onClick={handleSubmit}
+            className="px-4 py-2 bg-[#A53860] text-lg text-white rounded-md w-full"
+          >
+            Submit Quiz
+          </button>
+          <button
+            onClick={resetQuiz}
+            className="px-4 py-2 bg-[#A53860] text-lg text-white rounded-md w-full"
+          >
+            Reset Quiz
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-      
   );
+  
   
 }

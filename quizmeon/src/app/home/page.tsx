@@ -13,148 +13,36 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   let [isPending, startTransition] = useTransition();
 
-  // Taylor Swift Dummy Quiz
-  const dummyQuiz = {
-    title: "Taylor Swift Ultimate Fan Quiz",
-    difficulty: "Any",
-    questions: [
-      {
-        question: "What is Taylor Swift's middle name?",
-        options: ["Alison", "Marie", "Nicole", "Grace"],
-        answer: "Alison"
-      },
-      {
-        question: "Which year did Taylor Swift release her debut album?",
-        options: ["2004", "2006", "2008", "2010"],
-        answer: "2006"
-      },
-      {
-        question: "What is the name of Taylor Swift's first album?",
-        options: ["Fearless", "Speak Now", "Taylor Swift", "Red"],
-        answer: "Taylor Swift"
-      },
-      {
-        question: "Which of these songs is NOT on the 'Red' album?",
-        options: [
-          "All Too Well",
-          "I Knew You Were Trouble",
-          "Blank Space",
-          "22"
-        ],
-        answer: "Blank Space"
-      },
-      {
-        question: "What is Taylor Swift’s lucky number?",
-        options: ["7", "13", "22", "5"],
-        answer: "13"
-      },
-      {
-        question: "Which album features the song 'Shake It Off'?",
-        options: ["Red", "1989", "Lover", "Speak Now"],
-        answer: "1989"
-      },
-      {
-        question: "What city was Taylor Swift born in?",
-        options: ["Los Angeles", "New York", "Nashville", "Reading"],
-        answer: "Reading"
-      },
-      {
-        question: "Which Taylor Swift album was inspired by folklore and storytelling?",
-        options: ["Lover", "Evermore", "Folklore", "Reputation"],
-        answer: "Folklore"
-      },
-      {
-        question: "What song contains the lyrics 'We are never ever getting back together'?",
-        options: ["The Man", "You Belong With Me", "22", "We Are Never Ever Getting Back Together"],
-        answer: "We Are Never Ever Getting Back Together"
-      },
-      {
-        question: "What year did Taylor Swift release 'Reputation'?",
-        options: ["2015", "2016", "2017", "2018"],
-        answer: "2017"
-      },
-      {
-        question: "Which of these albums has a completely re-recorded 'Taylor’s Version' release?",
-        options: ["Reputation", "1989", "Fearless", "Lover"],
-        answer: "Fearless"
-      },
-      {
-        question: "Which song did Taylor Swift write about Kanye West?",
-        options: ["The Man", "Mean", "Innocent", "Bad Blood"],
-        answer: "Innocent"
-      },
-      {
-        question: "What instrument did Taylor Swift learn first?",
-        options: ["Piano", "Banjo", "Guitar", "Violin"],
-        answer: "Guitar"
-      },
-      {
-        question: "Which of these movies did Taylor Swift act in?",
-        options: ["Cats", "La La Land", "A Star Is Born", "The Notebook"],
-        answer: "Cats"
-      },
-      {
-        question: "Which Taylor Swift song is about a scarf?",
-        options: ["Red", "All Too Well", "The Archer", "You Belong With Me"],
-        answer: "All Too Well"
-      },
-      {
-        question: "What is the name of Taylor Swift’s documentary on Netflix?",
-        options: ["Miss Americana", "Folklore: The Long Pond Sessions", "Taylor Nation", "Swift Speak"],
-        answer: "Miss Americana"
-      },
-      {
-        question: "Which of these actors did Taylor Swift date?",
-        options: ["Chris Evans", "Jake Gyllenhaal", "Robert Pattinson", "Timothée Chalamet"],
-        answer: "Jake Gyllenhaal"
-      },
-      {
-        question: "What is the last track on Taylor Swift's 'Lover' album?",
-        options: ["Daylight", "Cornelia Street", "The Archer", "Cruel Summer"],
-        answer: "Daylight"
-      },
-      {
-        question: "Which Taylor Swift album was the first to win Album of the Year at the Grammys?",
-        options: ["1989", "Fearless", "Red", "Speak Now"],
-        answer: "Fearless"
-      },
-      {
-        question: "What is the name of Taylor Swift’s cat?",
-        options: ["Meredith", "Oliver", "Whiskers", "Luna"],
-        answer: "Meredith"
-      }
-    ]
-  };
+  
 
-  // Handle Submit
   const handleSubmit = async () => {
-    console.log("Submitting quiz...");
-    localStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify(dummyQuiz));
-    router.push("/quiz");
-
-    // setLoading(true); // Show loading state
-
-    // try {
-    //   const response = await fetch("/api/quiz", {
-    //     method: "POST",
-    //     headers: { "Content-Type": "application/json" },
-    //     body: JSON.stringify({ prompt, difficulty, numQuestions }),
-    //   });
-
-    //   if (!response.ok) throw new Error("Failed to fetch quiz");
-
-    //   const quizData = await response.json();
-    //   localStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify(quizData));
-
-    //   startTransition(() => {
-    //     router.push("/quiz"); // Navigate only after fetching is done
-    //   });
-    // } catch (error) {
-    //   console.error("Error fetching quiz:", error);
-    // } finally {
-    //   setLoading(false);
-    // }
+    setLoading(true); // Show loading state
+  
+    try {
+      const response = await fetch("/api/quiz/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: prompt, difficulty, numQuestions }), // Changed `prompt` to `title`
+      });
+  
+      if (!response.ok) throw new Error("Failed to fetch quiz");
+  
+      const quizData = await response.json();
+      
+      if (!quizData.questions) throw new Error("Invalid quiz data received");
+  
+      localStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify(quizData));
+  
+      startTransition(() => {
+        router.push("/quiz"); // Navigate after fetching is done
+      });
+    } catch (error) {
+      console.error("Error fetching quiz:", error);
+    } finally {
+      setLoading(false);
+    }
   };
+  
 
   return (
     <div className="flex  flex-col items-center justify-center min-h-screen bg-[#F9DBBD]">
@@ -191,12 +79,38 @@ export default function Home() {
           ))}
         </select>
 
-        <button
-          onClick={handleSubmit}
-          className="w-full px-6 py-3 bg-[#A53860] text-lg text-white font-bold rounded-md shadow-md hover:opacity-80 transition"
-        >
-          Submit
-        </button>
+        
+        {loading ? (
+  <button
+    type="button"
+    className="w-full px-6 py-3 text-lg font-bold rounded-md shadow-md transition bg-[#A53860] hover:opacity-80 focus:ring-blue-500 focus:ring-offset-blue-200 text-white flex justify-center items-center max-w-md"
+    disabled
+  >
+    <svg
+      width="20"
+      height="20"
+      fill="currentColor"
+      className="mr-2 animate-spin"
+      viewBox="0 0 1792 1792"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M526 1394q0 53-37.5 90.5t-90.5 37.5q-52 0-90-38t-38-90q0-53 37.5-90.5t90.5-37.5 90.5 37.5 37.5 90.5zm498 206q0 53-37.5 90.5t-90.5 37.5-90.5-37.5-37.5-90.5 37.5-90.5 90.5-37.5 90.5 37.5 37.5 90.5zm-704-704q0 53-37.5 90.5t-90.5 37.5-90.5-37.5-37.5-90.5 37.5-90.5 90.5-37.5 90.5 37.5 37.5 90.5zm1202 498q0 52-38 90t-90 38q-53 0-90.5-37.5t-37.5-90.5 37.5-90.5 90.5-37.5 90.5 37.5 37.5 90.5zm-964-996q0 66-47 113t-113 47-113-47-47-113 47-113 113-47 113 47 47 113zm1170 498q0 53-37.5 90.5t-90.5 37.5-90.5-37.5-37.5-90.5 37.5-90.5 90.5-37.5 90.5 37.5 37.5 90.5zm-640-704q0 80-56 136t-136 56-136-56-56-136 56-136 136-56 136 56 56 136zm530 206q0 93-66 158.5t-158 65.5q-93 0-158.5-65.5t-65.5-158.5q0-92 65.5-158t158.5-66q92 0 158 66t66 158z">
+      </path>
+    </svg>
+    Loading...
+  </button>
+) : (
+  <button
+    onClick={handleSubmit}
+    disabled={loading}
+    className="w-full px-6 py-3 text-lg font-bold rounded-md shadow-md transition bg-[#A53860] hover:opacity-80 text-white max-w-md"
+  >
+    Submit
+  </button>
+)}
+
+
+
       </div>
     </div>
   );
