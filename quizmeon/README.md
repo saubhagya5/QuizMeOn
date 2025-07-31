@@ -6,7 +6,8 @@
 
 - Generate quizzes on any topic
 - Smart prompt engineering for accurate question generation
-- Multiple question types: MCQs, true/false, short answers
+- Save quizzes to the database
+- Share quizzes with unique URLs
 - Gemini API integration for AI-generated content
 - Built with Next.js for fast and efficient rendering
 - Responsive and clean user interface
