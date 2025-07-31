@@ -28,4 +28,5 @@ npm run dev
 ```
 
 ## Environment Variables 
-
+- GEMINI_API_KEY 
+- DB_URI 
