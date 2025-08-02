@@ -1,4 +1,4 @@
-"use client"; // Force this to be a client component
+"use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -8,90 +8,37 @@ type QuizQuestion = {
   options: string[];
   correctAnswer: string;
 };
+
 type QuizData = {
   title: string;
   difficulty: string;
-}
+};
 
-const QUIZ_STORAGE_KEY = "quizData";
 const USER_ANSWERS_KEY = "userAnswers";
 const SCORE_STORAGE_KEY = "quizScore";
 
-export default function QuizPage() {
-  const [quiz, setQuiz] = useState<QuizQuestion[]>([]);
-  const [quizData, setQuizData] = useState<QuizData[]>({});
+type QuizProps = {
+  quizData: QuizData;
+  quizQuestions: QuizQuestion[];
+};
+
+export default function Quiz({ quizData, quizQuestions }: QuizProps) {
   const [userAnswers, setUserAnswers] = useState<Record<number, string>>({});
-  const [error, setError] = useState<string | null>(null);
-  const [isFetched, setIsFetched] = useState(false);
   const router = useRouter();
 
-  // Load quiz data and answers from localStorage
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const savedQuiz = localStorage.getItem(QUIZ_STORAGE_KEY);
-      const storedAnswers = localStorage.getItem(USER_ANSWERS_KEY)
-  
-      if (savedQuiz) {
+      const storedAnswers = localStorage.getItem(USER_ANSWERS_KEY);
+      if (storedAnswers) {
         try {
-          const parsedQuiz = JSON.parse(savedQuiz);
-          setQuizData(parsedQuiz)
-          console.log("Parsed quiz data:", parsedQuiz);
-          setQuiz(parsedQuiz.questions); // Ensure it's an array of questions
-  
-          
+          setUserAnswers(JSON.parse(storedAnswers));
         } catch (error) {
-          console.error("Error parsing stored quiz data:", error);
-          localStorage.removeItem(QUIZ_STORAGE_KEY);
-          fetchQuiz();
+          console.error("Error parsing stored user answers:", error);
+          localStorage.removeItem(USER_ANSWERS_KEY);
         }
-      } else {
-        console.log("No quiz found in storage. Fetching...");
-        fetchQuiz();
-        }
-        
-
-        if (storedAnswers) {
-            try {
-              const parsedAnswers = JSON.parse(storedAnswers);
-              setUserAnswers(parsedAnswers);
-            } catch (error) {
-              console.error("Error parsing stored user answers:", error);
-              localStorage.removeItem(USER_ANSWERS_KEY);
-            }
-          }
+      }
     }
   }, []);
-
-  
-  
-
-  const fetchQuiz = async () => {
-    try {
-      console.log("Fetching quiz...");
-      const response = await fetch("/api/quiz");
-  
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-  
-      const data: QuizQuestion[] = await response.json();
-      console.log("Fetched quiz data:", data);
-  
-      if (data.length === 0) {
-        console.warn("Fetched quiz data is empty.");
-        return;
-      }
-      //setQuizData(parsedQuiz)
-      //setQuiz(parsedQuiz.questions); // Ensure it's an array of questions
-      localStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify(data));
-  
-      
-    } catch (error) {
-      console.error("Failed to fetch quiz:", error);
-    }
-  };
-  
-  
 
   const handleAnswerSelect = (questionIndex: number, selectedOption: string) => {
     const updatedAnswers = { ...userAnswers, [questionIndex]: selectedOption };
@@ -100,27 +47,21 @@ export default function QuizPage() {
   };
 
   const handleSubmit = () => {
-    const storedAnswers = JSON.parse(localStorage.getItem(USER_ANSWERS_KEY) || "{}");
     let score = 0;
-    quiz.forEach((q, index) => {
-      console.log("Checking answer for question",storedAnswers, storedAnswers[index], q.correctAnswer);
-
-      if (storedAnswers[index] === q.correctAnswer) {
+    quizQuestions.forEach((q, index) => {
+      if (userAnswers[index] === q.correctAnswer) {
         score += 1;
       }
     });
-  
+
     localStorage.setItem(SCORE_STORAGE_KEY, JSON.stringify(score));
     router.push("/score");
   };
-  
 
   const resetQuiz = () => {
-    localStorage.removeItem(QUIZ_STORAGE_KEY);
     localStorage.removeItem(USER_ANSWERS_KEY);
     localStorage.removeItem(SCORE_STORAGE_KEY);
     setUserAnswers({});
-    fetchQuiz();
   };
 
   return (
@@ -129,18 +70,18 @@ export default function QuizPage() {
         Quiz Me On
       </h1>
       <p className="text-lg md:text-xl font-semibold text-[#A53860] text-center mt-2">
-        Quiz length: {quiz.length} | Difficulty: {quizData.difficulty}
+        Quiz length: {quizQuestions.length} | Difficulty: {quizData.difficulty}
       </p>
-  
+
       <hr className="border-[#450920] border-x-2 border-y-2 my-4" />
-  
+
       <h2 className="text-2xl md:text-3xl text-[#A53860] font-bold text-center mt-4">
         {quizData.title}
       </h2>
-  
+
       <div className="flex flex-col items-center w-full p-4">
-        {quiz.length > 0 ? (
-          quiz.map((q, index) => (
+        {quizQuestions.length > 0 ? (
+          quizQuestions.map((q, index) => (
             <div
               key={index}
               className="mt-6 p-5 border border-[#450920] shadow-2xl border-x-4 border-y-4 bg-[#FFA5AB] rounded-md w-full max-w-3xl"
@@ -169,7 +110,7 @@ export default function QuizPage() {
         ) : (
           <p className="text-center text-lg">Loading quiz...</p>
         )}
-  
+
         {/* Buttons */}
         <div className="mt-6 flex flex-col md:flex-row gap-4 w-full max-w-sm">
           <button
@@ -188,6 +129,4 @@ export default function QuizPage() {
       </div>
     </div>
   );
-  
-  
 }
