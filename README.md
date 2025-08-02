@@ -30,4 +30,5 @@ npm run dev
 
 ## Environment Variables 
 - GEMINI_API_KEY 
-- DB_URI 
+- DB_URI
+- QUIZ_STORAGE_KEY
