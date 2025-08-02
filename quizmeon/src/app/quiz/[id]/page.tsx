@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense, lazy } from "react";
 import { useParams } from "next/navigation";
+const QuizComponent = lazy(() => import("../Quiz"));
 
 type QuizQuestion = {
   question: string;
@@ -18,6 +19,7 @@ type QuizData = {
 export default function QuizDetailPage() {
   const { id } = useParams();
   const [quiz, setQuiz] = useState<QuizData | null>(null);
+    const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -28,8 +30,9 @@ export default function QuizDetailPage() {
 
         const data = await response.json();
         setQuiz(data);
+        setQuizQuestions(data.questions);
       } catch (error) {
-        setError("Failed to fetch quiz");
+        setError("Failed to fetch quiz"+error);
       }
     };
 
@@ -42,35 +45,9 @@ export default function QuizDetailPage() {
   if (!quiz) return <p className="text-center">Loading...</p>;
 
   return (
-    <div className="p-6 min-h-screen bg-[#F9DBBD]">
-      <h1 className="text-3xl md:text-5xl text-[#450920] font-bold text-center">
-        {quiz.title}
-      </h1>
-      <p className="text-lg md:text-xl font-semibold text-[#A53860] text-center mt-2">
-        Difficulty: {quiz.difficulty}
-      </p>
+      <Suspense fallback={<div className="text-center text-lg">Loading Quiz...</div>}>
+        <QuizComponent quizData={quiz} quizQuestions={quizQuestions} />
+      </Suspense>
+    );
 
-      <div className="mt-6 flex flex-col items-center w-full">
-        {quiz.questions.map((q, index) => (
-          <div
-            key={index}
-            className="mt-6 p-5 border border-[#450920] shadow-2xl bg-[#FFA5AB] rounded-md w-full max-w-3xl"
-          >
-            <h2 className="font-semibold text-lg md:text-xl text-[#A53860]">
-              {index + 1}. {q.question}
-            </h2>
-            <ul>
-              {q.options.map((option, i) => (
-                <li key={i} className="mt-3">
-                  <button className="w-full md:w-auto px-4 py-2 bg-[#A53860] text-white rounded-md">
-                    {option}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
 }
